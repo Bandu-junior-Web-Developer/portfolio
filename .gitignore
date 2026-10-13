@@ -1,0 +1,10 @@
+# Working files that are not part of the website
+info-form.html
+my-info*.json
+spec.md
+plan.md
+
+# Editor and system files
+.vscode/
+.DS_Store
+Thumbs.db
