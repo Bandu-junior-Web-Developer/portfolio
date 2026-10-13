@@ -405,3 +405,98 @@
     display: none;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .section-head.reveal {
+    filter: none;
+  }
+
+  .bg-beams,
+  .cursor-glow {
+    display: none;
+  }
+
+  .skill-list li:hover .skill-badge {
+    transform: none;
+  }
+}
+
+/* ----- Visual refresh: smaller screens ----- */
+@media (max-width: 1199px) {
+  .hero__badge--one {
+    left: -40px;
+  }
+
+  .hero__badge--two {
+    right: -12px;
+  }
+}
+
+@media (max-width: 991px) {
+  .hero__portrait {
+    max-width: 320px;
+    margin-left: 0;
+  }
+
+  .hero__badge--one {
+    top: 10%;
+    left: auto;
+    right: -70px;
+  }
+
+  .hero__badge--two {
+    right: -50px;
+  }
+
+  .contact {
+    padding: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav {
+    width: calc(100% - 16px);
+  }
+
+  .hero__portrait {
+    max-width: 260px;
+  }
+
+  .hero__badge {
+    font-size: 0.76rem;
+  }
+
+  .hero__badge--one {
+    right: -34px;
+  }
+
+  .hero__badge--two {
+    right: -24px;
+  }
+
+  .contact {
+    width: calc(100% - 24px);
+    padding: 28px 16px;
+    border-radius: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__badge {
+    transform: none;
+  }
+}
+
+/* Keep the first photo label off the face on stacked layouts */
+@media (max-width: 991px) {
+  .hero__badge--one {
+    top: -16px;
+    right: -64px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero__badge--one {
+    right: -30px;
+  }
+}

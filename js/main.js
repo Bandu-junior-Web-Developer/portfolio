@@ -365,7 +365,27 @@
         const box = card.getBoundingClientRect();
         card.style.setProperty('--mx', `${event.clientX - box.left}px`);
         card.style.setProperty('--my', `${event.clientY - box.top}px`);
+
+        // Tilt toward the pointer, a few degrees at most
+        const tiltX = (event.clientX - box.left) / box.width - 0.5;
+        const tiltY = (event.clientY - box.top) / box.height - 0.5;
+        card.style.setProperty('--ry', `${(tiltX * 7).toFixed(2)}deg`);
+        card.style.setProperty('--rx', `${(tiltY * -7).toFixed(2)}deg`);
       });
+    });
+  }
+
+  /* ----- Page: soft light that follows the pointer ----- */
+  const cursorGlow = $('#cursor-glow');
+
+  if (cursorGlow && !reducedMotion && window.matchMedia('(hover: hover)').matches) {
+    window.addEventListener('pointermove', (event) => {
+      cursorGlow.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+      cursorGlow.classList.add('is-active');
+    }, { passive: true });
+
+    document.documentElement.addEventListener('pointerleave', () => {
+      cursorGlow.classList.remove('is-active');
     });
   }
 

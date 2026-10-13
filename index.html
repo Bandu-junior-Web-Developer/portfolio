@@ -60,6 +60,8 @@
 
   <!-- ===== Header / Navigation ===== -->
   <canvas class="bg-canvas" id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="bg-beams" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
   <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
 
   <header class="site-header" id="site-header">
@@ -93,10 +95,11 @@
 
     <!-- ===== Hero ===== -->
     <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="hero__orbs" aria-hidden="true"><span></span><span></span></div>
       <div class="container hero__inner">
         <div class="hero__content">
           <p class="hero__status"><span class="status-dot" aria-hidden="true"></span>Available for new projects</p>
-          <h1 class="hero__title" id="hero-title">Hi, I'm <span class="accent">Ban Du Zaw</span></h1>
+          <h1 class="hero__title" id="hero-title"><span class="hero__hello">Hi, I'm</span> <span class="accent">Ban Du Zaw</span></h1>
           <p class="hero__role">Web Developer &amp; IT Solutions Enthusiast</p>
           <p class="hero__intro">I build modern, responsive websites and practical digital solutions. Passionate about learning, creating, and turning ideas into reality.</p>
 
@@ -114,8 +117,12 @@
         </div>
 
         <div class="hero__visual">
-          <div class="hero__photo">
-            <img src="assets/images/profilephoto.jpg" alt="Portrait of Ban Du Zaw" width="720" height="960" fetchpriority="high">
+          <div class="hero__portrait">
+            <div class="hero__photo">
+              <img src="assets/images/profilephoto.jpg" alt="Portrait of Ban Du Zaw" width="720" height="960" fetchpriority="high">
+            </div>
+            <p class="hero__badge hero__badge--one"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>Web Development</p>
+            <p class="hero__badge hero__badge--two"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span>Cyber Security</p>
           </div>
         </div>
       </div>

@@ -1908,3 +1908,432 @@ body::before {
   background: var(--accent);
   box-shadow: 0 0 0 4px var(--accent-soft), 0 0 16px rgba(110, 163, 255, 0.8);
 }
+
+/* ==========================================================================
+   Extra polish: light beams, colour orbs, glass cards, tilt
+   ========================================================================== */
+
+/* ----- Background: light beams travelling down the grid lines ----- */
+@keyframes beam-fall {
+  to {
+    transform: translateY(115vh);
+  }
+}
+
+.bg-beams {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-beams span {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 170px;
+  background: linear-gradient(transparent, rgba(110, 163, 255, 0.7), #7fe0ff);
+  opacity: 0.55;
+  transform: translateY(-200px);
+  animation: beam-fall 9s linear infinite;
+}
+
+/* Positions sit on the 64px background grid */
+.bg-beams span:nth-child(1) { left: 128px; animation-duration: 9s; }
+.bg-beams span:nth-child(2) { left: 448px; animation-duration: 12s; animation-delay: 3.2s; }
+.bg-beams span:nth-child(3) { left: 768px; animation-duration: 8s; animation-delay: 1.4s; }
+.bg-beams span:nth-child(4) { left: 1088px; animation-duration: 13s; animation-delay: 5.5s; }
+.bg-beams span:nth-child(5) { left: 1408px; animation-duration: 10s; animation-delay: 7.1s; }
+
+/* ----- Background: light that follows the pointer ----- */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 520px;
+  height: 520px;
+  margin: -260px 0 0 -260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.17), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease), transform 0.25s ease-out;
+  pointer-events: none;
+}
+
+.cursor-glow.is-active {
+  opacity: 1;
+}
+
+/* ----- Hero: slow colour orbs ----- */
+@keyframes orb-a {
+  to {
+    transform: translate3d(130px, -80px, 0) scale(1.2);
+  }
+}
+
+@keyframes orb-b {
+  to {
+    transform: translate3d(-150px, 70px, 0) scale(0.85);
+  }
+}
+
+.hero__orbs {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero__orbs span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.hero__orbs span:first-child {
+  top: 28%;
+  left: -140px;
+  width: 420px;
+  height: 420px;
+  background: rgba(124, 58, 237, 0.26);
+  animation: orb-a 18s ease-in-out infinite alternate;
+}
+
+.hero__orbs span:last-child {
+  top: -120px;
+  left: 38%;
+  width: 360px;
+  height: 360px;
+  background: rgba(34, 211, 238, 0.16);
+  animation: orb-b 22s ease-in-out infinite alternate;
+}
+
+/* ----- Section titles: light-to-blue gradient text, soft focus-in ----- */
+.section-title {
+  background: linear-gradient(90deg, #ffffff 15%, #c3d8ff 65%, #6ea3ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.js .section-head.reveal {
+  filter: blur(8px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease), filter 0.7s var(--ease);
+}
+
+.js .section-head.reveal.is-visible {
+  filter: none;
+}
+
+/* ----- Cards: glass surface, blue glow on hover ----- */
+.skill-card,
+.project-card,
+.timeline__card,
+.edu-card,
+.cert-card,
+.service-card,
+.contact-form,
+.stat {
+  background: linear-gradient(180deg, rgba(26, 34, 51, 0.84), rgba(18, 24, 38, 0.84));
+}
+
+:is(.skill-card, .project-card, .edu-card, .cert-card, .service-card):hover {
+  border-color: rgba(110, 163, 255, 0.45);
+  box-shadow: 0 24px 60px -28px rgba(37, 99, 235, 0.8);
+}
+
+/* ----- Cards: tilt toward the pointer (mouse devices, motion allowed) ----- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .js .reveal.is-settled:is(.skill-card, .edu-card, .cert-card, .service-card):hover {
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px);
+  }
+}
+
+/* ----- Small hover details ----- */
+.brand__mark {
+  transition: background-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+.brand:hover .brand__mark {
+  background: var(--accent-soft);
+  box-shadow: 0 0 20px -2px rgba(110, 163, 255, 0.75);
+}
+
+.nav__link:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.social__link:hover {
+  box-shadow: 0 0 22px -6px rgba(110, 163, 255, 0.8);
+}
+
+.tags li {
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+
+.tags li:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.skill-badge {
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+
+.skill-list li:hover .skill-badge {
+  transform: scale(1.1);
+}
+
+/* ----- Footer: glowing top edge ----- */
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: min(680px, 70%);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: translateX(-50%);
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   Visual refresh: floating navbar, larger hero, colour accents, glass edges
+   ========================================================================== */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #2a3a5c var(--bg);
+}
+
+/* ----- Navbar: floating glass bar ----- */
+.site-header {
+  padding-top: 12px;
+  border-bottom: 0;
+}
+
+.site-header.is-scrolled {
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.nav {
+  width: calc(100% - 24px);
+  height: calc(var(--header-h) - 12px);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  transition: background-color var(--t) var(--ease), border-color var(--t) var(--ease),
+    box-shadow var(--t) var(--ease);
+}
+
+.is-scrolled .nav {
+  background: rgba(13, 17, 26, 0.9);
+  border-color: var(--border);
+  box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.9);
+}
+
+/* ----- Hero: greeting line above a larger name ----- */
+.hero__title {
+  font-size: clamp(2.6rem, 9vw, 5rem);
+  line-height: 1;
+}
+
+.hero__hello {
+  display: block;
+  margin-bottom: 0.35em;
+  color: var(--muted);
+  font-size: 0.34em;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.hero__title .accent {
+  filter: drop-shadow(0 0 28px rgba(110, 163, 255, 0.35));
+}
+
+/* ----- Hero portrait with floating labels ----- */
+.hero__portrait {
+  position: relative;
+  max-width: 380px;
+  margin-left: auto;
+}
+
+.hero__portrait .hero__photo {
+  max-width: none;
+  margin: 0;
+}
+
+@keyframes float-small {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-9px);
+  }
+}
+
+.hero__badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
+  border: 1px solid rgba(110, 163, 255, 0.35);
+  border-radius: var(--radius);
+  background: rgba(13, 17, 26, 0.88);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.9), 0 0 24px -10px rgba(110, 163, 255, 0.8);
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+  animation: float-small 4s ease-in-out infinite alternate;
+}
+
+.hero__badge .icon-box {
+  width: 32px;
+  height: 32px;
+  font-size: 0.9rem;
+}
+
+.hero__badge--one {
+  top: 13%;
+  left: -68px;
+}
+
+.hero__badge--two {
+  right: -34px;
+  bottom: 12%;
+  animation-delay: -2s;
+}
+
+.hero__badge--two .icon-box {
+  border-color: rgba(167, 139, 250, 0.4);
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+}
+
+/* ----- Buttons: gradient primary ----- */
+.btn--primary {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 12px 34px -12px rgba(79, 70, 229, 0.95);
+}
+
+.btn--primary:hover {
+  background: linear-gradient(135deg, #1d4ed8, #6d28d9);
+}
+
+.filter.is-active {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  border-color: transparent;
+}
+
+/* ----- Cards: gradient glass edge ----- */
+.skill-card,
+.project-card,
+.timeline__card,
+.edu-card,
+.cert-card,
+.service-card,
+.contact-form,
+.stat {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(26, 34, 51, 0.9), rgba(18, 24, 38, 0.9)) padding-box,
+    linear-gradient(140deg, rgba(110, 163, 255, 0.5), rgba(148, 163, 184, 0.12) 35%, rgba(148, 163, 184, 0.1) 65%, rgba(167, 139, 250, 0.42)) border-box;
+}
+
+/* ----- Skills and services: one colour per card ----- */
+.skills-grid .skill-card:nth-child(4n + 1),
+.services-grid .service-card:nth-child(4n + 1) { --c: #6ea3ff; }
+
+.skills-grid .skill-card:nth-child(4n + 2),
+.services-grid .service-card:nth-child(4n + 2) { --c: #22d3ee; }
+
+.skills-grid .skill-card:nth-child(4n + 3),
+.services-grid .service-card:nth-child(4n + 3) { --c: #a78bfa; }
+
+.skills-grid .skill-card:nth-child(4n + 4),
+.services-grid .service-card:nth-child(4n + 4) { --c: #34d399; }
+
+:is(.skill-card, .service-card) .icon-box {
+  border-color: color-mix(in srgb, var(--c) 38%, transparent);
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  color: var(--c);
+}
+
+:is(.skill-card, .service-card):hover .icon-box {
+  border-color: var(--c);
+  box-shadow: 0 0 22px -4px var(--c);
+}
+
+:is(.skill-card, .service-card)::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 22px;
+  right: 22px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--c), transparent);
+  pointer-events: none;
+}
+
+.skill-list li:hover .skill-badge {
+  border-color: var(--c);
+  color: var(--c);
+}
+
+/* ----- Statistics: gradient numbers ----- */
+.stat dd {
+  background: linear-gradient(135deg, #6ea3ff, #7fe0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ----- Soft colour behind some sections ----- */
+#projects,
+#education,
+#contact {
+  position: relative;
+}
+
+#projects::after,
+#education::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+#projects::after {
+  top: 6%;
+  right: -260px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.16), transparent 65%);
+}
+
+#education::after {
+  top: 0;
+  left: -280px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.13), transparent 65%);
+}
+
+/* ----- Contact: one glowing glass panel ----- */
+.contact {
+  width: calc(100% - var(--gutter) * 2);
+  max-width: var(--container);
+  padding: 56px;
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background:
+    radial-gradient(640px 320px at 12% 0%, rgba(37, 99, 235, 0.24), transparent 70%) padding-box,
+    linear-gradient(180deg, rgba(18, 24, 38, 0.8), rgba(13, 17, 26, 0.8)) padding-box,
+    linear-gradient(140deg, rgba(110, 163, 255, 0.6), rgba(148, 163, 184, 0.1) 40%, rgba(167, 139, 250, 0.5)) border-box;
+  box-shadow: 0 40px 100px -50px rgba(37, 99, 235, 0.7);
+}
