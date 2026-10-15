@@ -5,12 +5,49 @@
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+  const booting = root.classList.contains('is-booting');
+
+  /* ----- Start-up screen: a short boot sequence, once per session ----- */
+  if (booting) {
+    const boot = document.createElement('div');
+    boot.className = 'boot';
+    boot.setAttribute('aria-hidden', 'true');
+    boot.innerHTML = `
+      <div class="boot__panel">
+        <p class="boot__line"><span>&gt;</span> initializing portfolio</p>
+        <p class="boot__line"><span>&gt;</span> loading modules: html css javascript <b>[ok]</b></p>
+        <p class="boot__line"><span>&gt;</span> starting interface <b>[ok]</b></p>
+        <p class="boot__line"><span>&gt;</span> welcome</p>
+        <div class="boot__bar"><i></i></div>
+      </div>`;
+    document.body.append(boot);
+
+    $$('.boot__line', boot).forEach((line, index) => {
+      window.setTimeout(() => line.classList.add('is-shown'), 100 + index * 190);
+    });
+
+    let finished = false;
+    const finishBoot = () => {
+      if (finished) return;
+      finished = true;
+      boot.classList.add('is-done');
+      root.classList.remove('is-booting');
+      try { sessionStorage.setItem('booted', '1'); } catch (error) { /* storage blocked */ }
+      window.setTimeout(() => boot.remove(), 450);
+    };
+
+    window.setTimeout(finishBoot, 1250);
+    boot.addEventListener('click', finishBoot);
+  }
 
   /* ----- Header state and back-to-top button ----- */
   const header = $('#site-header');
   const toTop = $('#to-top');
   const progress = $('#scroll-progress');
   const timeline = $('.timeline');
+  const statusScroll = $('#sb-scroll');
+  const statusSection = $('#sb-section');
   let ticking = false;
 
   const onScroll = () => {
@@ -19,7 +56,9 @@
     toTop.classList.toggle('is-visible', y > 600);
 
     const max = document.documentElement.scrollHeight - window.innerHeight;
-    progress.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
+    const scrolled = max > 0 ? Math.min(y / max, 1) : 0;
+    progress.style.transform = `scaleX(${scrolled})`;
+    if (statusScroll) statusScroll.textContent = `${Math.round(scrolled * 100)}%`;
 
     // Fill the timeline line as it passes through the viewport
     if (timeline) {
@@ -83,7 +122,12 @@
   if ('IntersectionObserver' in window) {
     const sectionObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) setActive(entry.target.dataset.nav || entry.target.id);
+        if (!entry.isIntersecting) return;
+        setActive(entry.target.dataset.nav || entry.target.id);
+
+        // Status bar shows the file-style label of the section in view
+        const label = entry.target.querySelector('.section-title');
+        if (statusSection) statusSection.textContent = (label && label.dataset.tag) || entry.target.id;
       });
     }, { rootMargin: '-45% 0px -54% 0px' });
 
@@ -99,8 +143,39 @@
     items.forEach((item, index) => item.style.setProperty('--delay', `${index * 0.08}s`));
   });
 
+  // Short titles resolve out of random characters, like text being decoded
+  const scrambleChars = '<>/[]{}=+*#_01';
+
+  const scramble = (element) => {
+    const finalText = element.textContent;
+    const steps = 20;
+    let step = 0;
+
+    element.setAttribute('aria-label', finalText);
+
+    const tick = () => {
+      step += 1;
+      const resolved = Math.floor((finalText.length * step) / steps);
+      element.textContent = Array.from(finalText, (char, index) => (
+        index < resolved || char === ' '
+          ? char
+          : scrambleChars[Math.floor(Math.random() * scrambleChars.length)]
+      )).join('');
+
+      if (step < steps) window.setTimeout(tick, 34);
+      else element.textContent = finalText;
+    };
+    tick();
+  };
+
   const settle = (item) => {
     item.classList.add('is-visible');
+
+    // Only plain, short titles: long ones would re-wrap while scrambling
+    const title = item.querySelector('.section-title');
+    if (title && !reducedMotion && !title.children.length && title.textContent.length <= 16) {
+      scramble(title);
+    }
     const delay = parseFloat(item.style.getPropertyValue('--delay')) || 0;
     window.setTimeout(() => item.classList.add('is-settled'), reducedMotion ? 0 : (delay + 0.75) * 1000);
   };
@@ -295,7 +370,8 @@
       if (index < fullText.length) window.setTimeout(type, 38);
       else window.setTimeout(() => caret.remove(), 2200);
     };
-    window.setTimeout(type, 700);
+    // Wait for the start-up screen to clear before typing
+    window.setTimeout(type, booting ? 1900 : 700);
   }
 
   /* ----- Hero: scrolling skills strip ----- */
@@ -503,6 +579,198 @@
 
     resize();
     start();
+  }
+
+  /* ----- Hero: live local time in Yangon ----- */
+  const clock = $('#local-time');
+
+  if (clock) {
+    try {
+      const timeFormat = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Yangon',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      });
+      const statusTime = $('#sb-time');
+      const updateClock = () => {
+        const now = `Yangon ${timeFormat.format(new Date())}`;
+        clock.textContent = now;
+        if (statusTime) statusTime.textContent = now;
+      };
+
+      updateClock();
+      clock.hidden = false;
+      window.setInterval(updateClock, 1000);
+    } catch (error) {
+      // Time zone data unavailable: leave the clock hidden
+    }
+  }
+
+  /* ----- About: terminal types its commands when it comes into view ----- */
+  const terminal = $('#terminal');
+
+  if (terminal && 'IntersectionObserver' in window && !reducedMotion) {
+    const lines = $$('.t-line', terminal);
+    const wait = (ms) => new Promise((resolve) => { window.setTimeout(resolve, ms); });
+
+    // Lines keep their space while hidden, so nothing below moves
+    terminal.classList.add('is-typing');
+
+    const playTerminal = async () => {
+      await wait(500);
+
+      for (const line of lines) {
+        const text = $('.t-text', line);
+
+        if (text) {
+          const command = text.textContent;
+          text.textContent = '';
+          line.classList.add('is-shown');
+
+          for (let index = 1; index <= command.length; index += 1) {
+            text.textContent = command.slice(0, index);
+            await wait(55);
+          }
+          await wait(260);
+        } else {
+          line.classList.add('is-shown');
+          await wait(line.classList.contains('t-last') ? 0 : 380);
+        }
+      }
+    };
+
+    const terminalObserver = new IntersectionObserver((entries, observer) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      playTerminal();
+    }, { threshold: 0.5 });
+
+    terminalObserver.observe(terminal);
+  }
+
+  /* ----- Status bar: window size ----- */
+  const statusSize = $('#sb-size');
+
+  if (statusSize) {
+    const updateSize = () => { statusSize.textContent = `${window.innerWidth} x ${window.innerHeight}`; };
+    updateSize();
+    window.addEventListener('resize', updateSize, { passive: true });
+  }
+
+  /* ----- Command menu: Ctrl+K (or Cmd+K) jumps to any section ----- */
+  const palette = $('#palette');
+
+  if (palette && typeof palette.showModal === 'function') {
+    const paletteInput = $('#palette-input');
+    const paletteList = $('#palette-list');
+    const paletteEmpty = $('#palette-empty');
+
+    const goTo = (selector) => () => {
+      $(selector).scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
+    };
+
+    const commands = [
+      { label: 'Home', hint: 'section', run: goTo('#home') },
+      { label: 'About Me', hint: 'section', run: goTo('#about') },
+      { label: 'Skills', hint: 'section', run: goTo('#skills') },
+      { label: 'Projects', hint: 'section', run: goTo('#projects') },
+      { label: 'Experience', hint: 'section', run: goTo('#experience') },
+      { label: 'Education', hint: 'section', run: goTo('#education') },
+      { label: 'Certifications', hint: 'section', run: goTo('#certifications') },
+      { label: 'Services', hint: 'section', run: goTo('#services') },
+      { label: 'Contact', hint: 'section', run: goTo('#contact') },
+      { label: 'Send an email', hint: 'action', run: () => { window.location.href = `mailto:${form.dataset.email}`; } },
+      { label: 'Open GitHub profile', hint: 'link', run: () => { window.open('https://github.com/bandu246', '_blank', 'noopener'); } },
+    ];
+
+    let matches = [];
+    let activeIndex = 0;
+
+    const highlight = () => {
+      $$('.palette__item', paletteList).forEach((item, index) => {
+        const active = index === activeIndex;
+        item.classList.toggle('is-active', active);
+        item.setAttribute('aria-selected', String(active));
+        if (active) {
+          paletteInput.setAttribute('aria-activedescendant', item.id);
+          item.scrollIntoView({ block: 'nearest' });
+        }
+      });
+    };
+
+    const runCommand = (command) => {
+      palette.close();
+      command.run();
+    };
+
+    const renderCommands = () => {
+      const query = paletteInput.value.trim().toLowerCase();
+      matches = commands.filter((command) => command.label.toLowerCase().includes(query));
+      activeIndex = 0;
+
+      paletteList.replaceChildren(...matches.map((command, index) => {
+        const item = document.createElement('li');
+        item.className = 'palette__item';
+        item.id = `palette-item-${index}`;
+        item.setAttribute('role', 'option');
+
+        const hint = document.createElement('span');
+        hint.textContent = command.hint;
+        item.append(command.label, hint);
+
+        item.addEventListener('click', () => runCommand(command));
+        item.addEventListener('pointermove', () => {
+          if (activeIndex !== index) {
+            activeIndex = index;
+            highlight();
+          }
+        });
+        return item;
+      }));
+
+      paletteEmpty.hidden = matches.length > 0;
+      if (!matches.length) paletteInput.removeAttribute('aria-activedescendant');
+      highlight();
+    };
+
+    const openPalette = () => {
+      if (palette.open) return;
+      paletteInput.value = '';
+      renderCommands();
+      palette.showModal();
+      paletteInput.focus();
+    };
+
+    paletteInput.addEventListener('input', renderCommands);
+
+    paletteInput.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (!matches.length) return;
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        activeIndex = (activeIndex + step + matches.length) % matches.length;
+        highlight();
+      } else if (event.key === 'Enter' && matches[activeIndex]) {
+        event.preventDefault();
+        runCommand(matches[activeIndex]);
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        openPalette();
+      }
+    });
+
+    $('#palette-open').addEventListener('click', openPalette);
+
+    // A click on the dialog element itself is a click on the backdrop
+    palette.addEventListener('click', (event) => {
+      if (event.target === palette) palette.close();
+    });
   }
 
   /* ----- Footer year ----- */

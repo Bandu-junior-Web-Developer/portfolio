@@ -26,7 +26,17 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
 
-  <script>document.documentElement.classList.add('js');</script>
+  <script>
+    (function (root) {
+      root.classList.add('js');
+      // Start-up screen: once per browser session, never with reduced motion
+      try {
+        if (!sessionStorage.getItem('booted') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          root.classList.add('is-booting');
+        }
+      } catch (error) { /* storage blocked: skip the start-up screen */ }
+    })(document.documentElement);
+  </script>
   <script src="js/main.js" defer></script>
 </head>
 <body>
@@ -85,6 +95,7 @@
           <li><a class="nav__link" href="#projects">Projects</a></li>
           <li><a class="nav__link" href="#experience">Experience</a></li>
           <li><a class="nav__link" href="#education">Education</a></li>
+          <li class="nav__kbd"><button type="button" id="palette-open" aria-label="Open command menu" aria-keyshortcuts="Control+K"><kbd>Ctrl</kbd><kbd>K</kbd></button></li>
           <li><a class="nav__link nav__link--cta" href="#contact">Contact</a></li>
         </ul>
       </nav>
@@ -98,7 +109,7 @@
       <div class="hero__orbs" aria-hidden="true"><span></span><span></span></div>
       <div class="container hero__inner">
         <div class="hero__content">
-          <p class="hero__status"><span class="status-dot" aria-hidden="true"></span>Available for new projects</p>
+          <p class="hero__status"><span class="status-dot" aria-hidden="true"></span>Available for new projects<span class="hero__clock" id="local-time" hidden></span></p>
           <h1 class="hero__title" id="hero-title"><span class="hero__hello">Hi, I'm</span> <span class="accent">Ban Du Zaw</span></h1>
           <p class="hero__role">Web Developer &amp; IT Solutions Enthusiast</p>
           <p class="hero__intro">I build modern, responsive websites and practical digital solutions. Passionate about learning, creating, and turning ideas into reality.</p>
@@ -141,7 +152,7 @@
       <div class="container about">
         <div class="about__content">
           <header class="section-head reveal">
-            <h2 class="section-title" id="about-title">About Me</h2>
+            <h2 class="section-title" id="about-title" data-tag="about.me">About Me</h2>
           </header>
 
           <div class="about__text reveal">
@@ -151,12 +162,32 @@
           </div>
         </div>
 
-        <dl class="stats reveal" data-stagger>
-          <div class="stat"><dt>Projects Completed</dt><dd>3</dd></div>
-          <div class="stat"><dt>Technologies</dt><dd>18</dd></div>
-          <div class="stat"><dt>Year of Learning</dt><dd>1</dd></div>
-          <div class="stat"><dt>Certifications</dt><dd>3</dd></div>
-        </dl>
+        <div class="about__side">
+          <div class="terminal reveal" id="terminal">
+            <div class="terminal__bar" aria-hidden="true">
+              <span></span><span></span><span></span>
+              <em>ban@portfolio: ~</em>
+            </div>
+            <div class="terminal__body">
+              <p class="t-line t-cmd"><span class="t-prompt" aria-hidden="true">ban@portfolio:~$</span> <span class="t-text">whoami</span></p>
+              <p class="t-line t-out">Ban Du Zaw — Web Developer &amp; IT Solutions Enthusiast</p>
+              <p class="t-line t-cmd"><span class="t-prompt" aria-hidden="true">ban@portfolio:~$</span> <span class="t-text">cat location.txt</span></p>
+              <p class="t-line t-out">Yangon, Myanmar</p>
+              <p class="t-line t-cmd"><span class="t-prompt" aria-hidden="true">ban@portfolio:~$</span> <span class="t-text">ls skills/</span></p>
+              <p class="t-line t-out t-dirs">frontend/ programming/ database/ cybersecurity/ tools/</p>
+              <p class="t-line t-cmd"><span class="t-prompt" aria-hidden="true">ban@portfolio:~$</span> <span class="t-text">cat status.txt</span></p>
+              <p class="t-line t-out t-ok">Studying Computer Science. Open to new projects.</p>
+              <p class="t-line t-cmd t-last" aria-hidden="true"><span class="t-prompt">ban@portfolio:~$</span> <span class="t-cursor"></span></p>
+            </div>
+          </div>
+
+          <dl class="stats reveal" data-stagger>
+            <div class="stat"><dt>Projects Completed</dt><dd>3</dd></div>
+            <div class="stat"><dt>Technologies</dt><dd>18</dd></div>
+            <div class="stat"><dt>Year of Learning</dt><dd>1</dd></div>
+            <div class="stat"><dt>Certifications</dt><dd>3</dd></div>
+          </dl>
+        </div>
       </div>
     </section>
 
@@ -165,7 +196,7 @@
       <div class="container">
         <header class="section-head section-head--split reveal">
           <div>
-            <h2 class="section-title" id="skills-title">Skills</h2>
+            <h2 class="section-title" id="skills-title" data-tag="skills.json">Skills</h2>
           </div>
           <p class="section-lead">Four areas I work in: web interfaces, programming and data, security testing, and the systems and tools around them.</p>
         </header>
@@ -233,7 +264,7 @@
       <div class="container">
         <header class="section-head section-head--split reveal">
           <div>
-            <h2 class="section-title" id="projects-title">Projects</h2>
+            <h2 class="section-title" id="projects-title" data-tag="projects/">Projects</h2>
           </div>
           <div class="filters" role="group" aria-label="Filter projects by type">
             <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">All</button>
@@ -257,6 +288,7 @@
 
           <article class="project-card project-card--featured reveal" data-category="web">
             <div class="project-card__media img-reveal">
+              <div class="window-bar" aria-hidden="true"><span></span><span></span><span></span><em>power-deal-myanmar / home</em></div>
               <img src="assets/images/ss.png" alt="Power Deal Myanmar website home page with the headline Power Deal Myanmar Optical Communication" width="1917" height="913" loading="lazy" decoding="async">
             </div>
             <div class="project-card__body">
@@ -292,7 +324,7 @@
     <section class="section section--alt" id="experience" aria-labelledby="experience-title">
       <div class="container">
         <header class="section-head reveal">
-          <h2 class="section-title" id="experience-title">Experience &amp; Learning Journey</h2>
+          <h2 class="section-title" id="experience-title" data-tag="experience.log">Experience &amp; Learning Journey</h2>
         </header>
 
         <!-- TODO: add your exact job title, company name and dates -->
@@ -333,7 +365,7 @@
     <section class="section" id="education" aria-labelledby="education-title">
       <div class="container">
         <header class="section-head reveal">
-          <h2 class="section-title" id="education-title">Education</h2>
+          <h2 class="section-title" id="education-title" data-tag="education.md">Education</h2>
         </header>
 
         <!-- TODO: add your degree name and study period for University of the People -->
@@ -358,7 +390,7 @@
     <section class="section section--tight" id="certifications" data-nav="education" aria-labelledby="cert-title">
       <div class="container">
         <header class="section-head reveal">
-          <h2 class="section-title" id="cert-title">Certifications</h2>
+          <h2 class="section-title" id="cert-title" data-tag="certificates/">Certifications</h2>
         </header>
 
         <!--
@@ -400,7 +432,7 @@
       <div class="container">
         <header class="section-head section-head--split reveal">
           <div>
-            <h2 class="section-title" id="services-title">Services</h2>
+            <h2 class="section-title" id="services-title" data-tag="services.sh">Services</h2>
           </div>
           <p class="section-lead">Available for freelance work, from a single landing page to a complete website with ongoing support.</p>
         </header>
@@ -444,7 +476,7 @@
     <section class="section" id="contact" aria-labelledby="contact-title">
       <div class="container contact">
         <div class="contact__info reveal">
-          <h2 class="section-title" id="contact-title">Have a project in mind?<br><span class="accent">Let's build something together.</span></h2>
+          <h2 class="section-title" id="contact-title" data-tag="contact.sh">Have a project in mind?<br><span class="accent">Let's build something together.</span></h2>
           <p class="section-lead">Send me a message and I'll reply as soon as I can.</p>
 
           <ul class="contact-list">
@@ -537,7 +569,7 @@
 
     <div class="container footer__bottom">
       <p>&copy; <span id="year">2026</span> Ban Du Zaw. All rights reserved.</p>
-      <p class="mono">Built with HTML, CSS &amp; JavaScript</p>
+      <p class="mono"><span class="t-prompt" aria-hidden="true">$</span> echo "Built with HTML, CSS &amp; JavaScript"</p>
     </div>
 
     <a class="to-top" id="to-top" href="#home" aria-label="Back to top">
@@ -562,6 +594,30 @@
       </div>
     </div>
   </dialog>
+
+  <!-- ===== Command menu (Ctrl+K) ===== -->
+  <dialog class="palette" id="palette" aria-label="Command menu">
+    <div class="palette__search">
+      <span class="t-prompt" aria-hidden="true">&gt;</span>
+      <input id="palette-input" type="text" placeholder="Type a section or command" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" aria-label="Search commands">
+      <kbd>Esc</kbd>
+    </div>
+    <ul class="palette__list" id="palette-list" role="listbox" aria-label="Commands"></ul>
+    <p class="palette__empty" id="palette-empty" hidden>No matching command.</p>
+    <p class="palette__foot" aria-hidden="true"><kbd>&uarr;</kbd><kbd>&darr;</kbd> move <kbd>Enter</kbd> open</p>
+  </dialog>
+
+  <!-- ===== Status bar (decorative: repeats information available elsewhere) ===== -->
+  <div class="statusbar" aria-hidden="true">
+    <span class="statusbar__branch">main</span>
+    <span id="sb-section">home</span>
+    <span id="sb-scroll">0%</span>
+    <span class="statusbar__spacer"></span>
+    <span class="statusbar__wide" id="sb-size"></span>
+    <span id="sb-time"></span>
+    <span class="statusbar__wide">UTF-8</span>
+    <span class="statusbar__wide">HTML</span>
+  </div>
 
 </body>
 </html>
