@@ -295,53 +295,6 @@
     $$('.js-details').forEach((button) => { button.hidden = true; });
   }
 
-  /* ----- Contact form: validate, then open the visitor's email app ----- */
-  const form = $('#contact-form');
-  const status = $('#contact-status');
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  const messages = {
-    name: 'Please enter your name.',
-    email: 'Please enter a valid email address.',
-    subject: 'Please enter a subject.',
-    message: 'Please write a message.',
-  };
-
-  const validateField = (field) => {
-    const value = field.value.trim();
-    const valid = field.name === 'email' ? emailPattern.test(value) : value.length > 0;
-    field.setAttribute('aria-invalid', String(!valid));
-    $(`#${field.id}-error`).textContent = valid ? '' : messages[field.name];
-    return valid;
-  };
-
-  const fields = $$('input, textarea', form);
-
-  fields.forEach((field) => {
-    field.addEventListener('blur', () => validateField(field));
-    field.addEventListener('input', () => {
-      if (field.getAttribute('aria-invalid') === 'true') validateField(field);
-    });
-  });
-
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const invalid = fields.filter((field) => !validateField(field));
-    if (invalid.length) {
-      status.textContent = '';
-      invalid[0].focus();
-      return;
-    }
-
-    const data = new FormData(form);
-    const body = `${data.get('message').trim()}\n\nFrom: ${data.get('name').trim()} <${data.get('email').trim()}>`;
-    const url = `mailto:${form.dataset.email}?subject=${encodeURIComponent(data.get('subject').trim())}&body=${encodeURIComponent(body)}`;
-
-    status.textContent = 'Opening your email app. Press send there to deliver the message.';
-    window.location.href = url;
-  });
-
   /* ----- Hero: type out the role once ----- */
   const role = $('.hero__role');
 
@@ -681,7 +634,7 @@
       { label: 'Certifications', hint: 'section', run: goTo('#certifications') },
       { label: 'Services', hint: 'section', run: goTo('#services') },
       { label: 'Contact', hint: 'section', run: goTo('#contact') },
-      { label: 'Send an email', hint: 'action', run: () => { window.location.href = `mailto:${form.dataset.email}`; } },
+      { label: 'Send an email', hint: 'action', run: () => { window.location.href = 'mailto:bandu24680@gmail.com'; } },
       { label: 'Open GitHub profile', hint: 'link', run: () => { window.open('https://github.com/bandu246', '_blank', 'noopener'); } },
     ];
 

@@ -2838,3 +2838,48 @@ body {
 .to-top {
   bottom: 48px;
 }
+
+/* ----- Contact: details only (no form), spread across the panel ----- */
+.contact {
+  grid-template-columns: 1fr;
+}
+
+.contact .contact-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.contact .contact-list li {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(10, 13, 20, 0.5);
+}
+
+.contact .contact-list a,
+.contact .contact-list span {
+  overflow-wrap: anywhere;
+}
+
+.brand__name {
+  white-space: nowrap;
+}
+
+/* ----- Logo ----- */
+.brand__logo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 10px rgba(110, 163, 255, 0.35));
+  transition: transform var(--t) var(--ease), filter var(--t) var(--ease);
+}
+
+.brand:hover .brand__logo {
+  transform: rotate(-8deg) scale(1.06);
+  filter: drop-shadow(0 0 14px rgba(110, 163, 255, 0.7));
+}
+
+.brand__logo {
+  border-radius: 50%;
+  object-fit: cover;
+}

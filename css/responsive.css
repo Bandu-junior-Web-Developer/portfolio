@@ -554,3 +554,36 @@
     margin-top: 10vh;
   }
 }
+
+@media (max-width: 991px) {
+  .contact .contact-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----- Navbar with eight links: tighten on smaller laptops ----- */
+@media (max-width: 1199px) and (min-width: 992px) {
+  .nav__kbd {
+    display: none;
+  }
+
+  .nav__link {
+    padding-inline: 9px;
+  }
+
+  .nav__link::after {
+    left: 9px;
+    right: 9px;
+  }
+
+  .nav__link--cta {
+    margin-left: 6px;
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand:hover .brand__logo {
+    transform: none;
+  }
+}

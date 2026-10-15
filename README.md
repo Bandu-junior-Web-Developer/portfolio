@@ -49,9 +49,9 @@ Copy one `<article class="project-card">` block and set `data-category` to `web`
 
 All colours, fonts and spacing are CSS variables at the top of `css/style.css`.
 
-## Contact form
+## Contact
 
-The form has no server. On submit it checks the fields and opens the visitor's email app with the message filled in, addressed to the `data-email` value on the form.
+The page has no contact form. Visitors reach you through the email, phone and GitHub links in the Contact section. To change them, edit that section in `index.html` (and the email in the Ctrl+K command menu in `js/main.js`).
 
 ## Publish on GitHub Pages
 
